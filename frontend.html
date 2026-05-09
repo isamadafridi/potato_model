@@ -1,0 +1,289 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Potato Disease Detector</title>
+    <style>
+        /* Modern Reset and Typography */
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body { 
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+            display: flex;
+            flex-direction: column; /* Stacks the header and container vertically */
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            color: #333;
+            position: relative;
+            overflow: hidden; /* Page stays locked, no scrollbars */
+        }
+
+        /* The Custom Blurred Background using your local image */
+        body::before {
+            content: "";
+            position: absolute;
+            top: -30px; left: -30px; right: -30px; bottom: -30px; 
+            background: url('background img.jpg') no-repeat center center fixed;
+            background-size: cover;
+            filter: blur(15px); 
+            z-index: -2;
+        }
+
+        /* Subtle dark overlay */
+        body::after {
+            content: "";
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(0, 0, 0, 0.4); /* Slightly darkened for better text contrast */
+            z-index: -1;
+        }
+
+        /* NEW: Header Section Styling */
+        .header-section {
+            text-align: center;
+            margin-bottom: 30px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .header-section h1 {
+            font-size: 36px;
+            color: #ffffff; /* White text to pop against the background */
+            margin-bottom: 8px;
+            font-weight: 800;
+            text-shadow: 0 4px 12px rgba(0, 0, 0, 0.6); /* Heavy shadow for readability */
+        }
+
+        .header-section .engineer-title {
+            font-size: 14px;
+            color: #e2e8f0;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            font-weight: 600;
+            text-shadow: 0 2px 8px rgba(0, 0, 0, 0.6);
+        }
+
+        /* Glassmorphism Main Card */
+        .container {
+            background: rgba(255, 255, 255, 0.92);
+            padding: 20px 20px;
+            border-radius: 20px;
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.4);
+            max-width: 800px; 
+            width: 95%;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.4);
+            position: relative;
+            z-index: 1;
+            
+            /* The Magic that puts them side-by-side */
+            display: flex;
+            flex-direction: row;
+            gap: 40px;
+            align-items: center; 
+        }
+
+        /* Left Side: Upload & Preview */
+        .left-panel {
+            flex: 1;
+            text-align: center;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        /* Right Side: Results */
+        .right-panel {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            min-height: 250px; 
+            border-left: 2px dashed rgba(0, 0, 0, 0.1); 
+            padding-left: 40px;
+        }
+
+        p.instructions {
+            color: #555;
+            margin-bottom: 20px;
+            font-size: 15px;
+        }
+
+        /* Styled File Input */
+        input[type="file"] {
+            display: block;
+            width: 100%;
+            padding: 12px;
+            margin-bottom: 20px;
+            border: 2px dashed #cbd5e1;
+            border-radius: 10px;
+            background: #f8fafc;
+            color: #64748b;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        input[type="file"]:hover {
+            border-color: #28a745;
+            background: #f0fdf4;
+        }
+
+        /* Image Preview */
+        img { 
+            max-width: 100%; 
+            height: auto;
+            border-radius: 12px; 
+            margin-bottom: 20px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            object-fit: cover;
+            max-height: 220px; 
+        }
+
+        /* Modern Button */
+        button { 
+            padding: 14px 35px; 
+            background: #28a745; 
+            color: white; 
+            border: none; 
+            border-radius: 8px; 
+            cursor: pointer; 
+            font-size: 16px; 
+            font-weight: 600;
+            letter-spacing: 0.5px;
+            transition: background 0.3s ease, transform 0.1s ease;
+            width: 100%;
+        }
+
+        button:hover {
+            background: #218838;
+        }
+
+        button:active {
+            transform: scale(0.98);
+        }
+
+        /* Result Banners */
+        .result { 
+            width: 100%;
+            padding: 30px 20px; 
+            border-radius: 12px; 
+            font-weight: 500;
+            transition: all 0.3s ease;
+            border: 1px solid transparent;
+            text-align: center;
+        }
+
+        .result h2 {
+            font-size: 26px;
+            margin-bottom: 12px;
+        }
+
+        .result h3 {
+            font-size: 18px;
+            font-weight: 400;
+            opacity: 0.9;
+        }
+
+        .healthy { 
+            background: #d4edda; 
+            color: #155724;
+            border-color: #c3e6cb;
+        }
+
+        .disease { 
+            background: #f8d7da; 
+            color: #721c24;
+            border-color: #f5c6cb;
+        }
+
+        /* Mobile Responsiveness */
+        @media (max-width: 768px) {
+            .container {
+                flex-direction: column;
+                gap: 20px;
+            }
+            .right-panel {
+                border-left: none;
+                border-top: 2px dashed rgba(0, 0, 0, 0.1);
+                padding-left: 0;
+                padding-top: 20px;
+                width: 100%;
+            }
+            .header-section h1 {
+                font-size: 28px;
+            }
+        }
+    </style>
+</head>
+<body>
+    
+    <div class="header-section">
+        <h1>🥔 Potato Disease Detector</h1>
+        <div class="engineer-title">Developed by  Abdul Samad Afridi ML & CV Engineer</div>
+    </div>
+
+    <div class="container">
+        
+        <div class="left-panel">
+            <p class="instructions">Upload a clear photo of a potato leaf for instant analysis</p>
+
+            <input type="file" id="imageInput" accept="image/*" onchange="previewImage()">
+            <img id="preview" style="display:none">
+            
+            <button onclick="predict()">Detect Disease</button>
+        </div>
+
+        <div class="right-panel">
+            <div id="result" class="result" style="display:none"></div>
+        </div>
+
+    </div>
+
+    <script>
+        function previewImage() {
+            const file = document.getElementById('imageInput').files[0];
+            const preview = document.getElementById('preview');
+            preview.src = URL.createObjectURL(file);
+            preview.style.display = 'block';
+        }
+
+        async function predict() {
+            const file = document.getElementById('imageInput').files[0];
+            if (!file) { alert('Please select an image!'); return; }
+
+            const formData = new FormData();
+            formData.append('file', file);
+
+            const resultDiv = document.getElementById('result');
+            resultDiv.style.display = 'block';
+            resultDiv.innerHTML = '⏳ Analyzing...';
+
+            try {
+                const response = await fetch('http://localhost:8000/predict', {
+                    method: 'POST',
+                    body: formData
+                });
+
+                const data = await response.json();
+
+                const isHealthy = data.class === 'Healthy';
+                resultDiv.className = isHealthy ? 'result healthy' : 'result disease';
+                resultDiv.innerHTML = `
+                    <h2>${isHealthy ? '✅' : '⚠️'}<br>${data.class}</h2>
+                    <h3>Confidence: ${data.confidence}</h3>
+                `;
+
+            } catch (err) {
+                resultDiv.innerHTML = '❌<br>Error connecting to server';
+                console.error(err);
+            }
+        }
+    </script>
+</body>
+</html>
