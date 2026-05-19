@@ -43,7 +43,7 @@ potato-disease-project/
 ### Step 1 — Clone the Repository
 
 ```bash
-git clone https://github.com/yourusername/potato-disease-detector.git
+git clone https://github.com/isamadafridi/potato_model.git
 cd potato-disease-detector
 ```
 
