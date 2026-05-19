@@ -37,6 +37,9 @@ potato-disease-project/
 - **Dataset** — PlantVillage Dataset (~2,152 images)
 
 ---
+## ☯️ Live Demo
+https://huggingface.co/spaces/isamadafridi/potato_disease_classifier
+----
 
 ## 🚀 Setup & Execution
 
